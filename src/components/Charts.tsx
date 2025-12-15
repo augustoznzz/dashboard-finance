@@ -219,7 +219,7 @@ export const Charts: React.FC<Props> = ({ transactions }) => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 sm:gap-0">
             <h3 className="text-lg font-bold dark:text-white flex items-center">
               <span className="w-1.5 h-6 bg-emerald-500 rounded-full mr-3"></span>
-              Receitas vs Despesas
+              Receitas x Despesas
             </h3>
             <div className="flex items-center gap-4 text-sm">
               <div className="flex items-center gap-2">
