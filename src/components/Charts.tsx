@@ -52,6 +52,26 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
+// Custom Tooltip for Pie Chart (no label)
+const PieTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-4 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700">
+        {payload.map((entry: any, index: number) => (
+          <div key={index} className="flex items-center space-x-2 text-sm">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
+            <span className="text-gray-600 dark:text-gray-300 capitalize">{entry.name}:</span>
+            <span className="font-bold text-gray-900 dark:text-white">
+              {typeof entry.value === 'number' ? formatCurrency(entry.value) : entry.value}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
 type Props = {
   transactions: Transaction[];
 };
@@ -157,7 +177,7 @@ export const Charts: React.FC<Props> = ({ transactions }) => {
                           />
                         ))}
                       </Pie>
-                      <Tooltip content={<CustomTooltip />} />
+                      <Tooltip content={<PieTooltip />} />
                     </PieChart>
                   </ResponsiveContainer>
 
