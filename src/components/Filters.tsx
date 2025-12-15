@@ -24,6 +24,22 @@ export const Filters: React.FC<Props> = ({ filters, onFilterChange }) => {
 
   const hasActiveFilters = Object.values(filters).some(value => value !== null && value !== '');
 
+  const formatNumber = (val: number | null): string => {
+    if (val === null || val === undefined) return '';
+    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
+
+  const parseNumber = (val: string): number | null => {
+    const raw = val.replace(/\./g, '');
+    if (!raw) return null;
+    return Number(raw);
+  };
+
+  const handleAmountChange = (key: 'minAmount' | 'maxAmount', value: string) => {
+    const numericValue = parseNumber(value);
+    onFilterChange({ ...filters, [key]: numericValue });
+  };
+
   return (
     <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-lg border border-white/20 dark:border-gray-700/50 mb-10 transition-all duration-300 overflow-hidden">
       <div
@@ -45,8 +61,9 @@ export const Filters: React.FC<Props> = ({ filters, onFilterChange }) => {
       </div>
 
       {isOpen && (
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div className="p-6 space-y-6">
+          {/* Row 1: Common text/date filters */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Data Inicial</label>
               <input
@@ -91,43 +108,47 @@ export const Filters: React.FC<Props> = ({ filters, onFilterChange }) => {
                 onChange={(e) => onFilterChange({ ...filters, category: e.target.value || null })}
               />
             </div>
+          </div>
 
-            <div className="space-y-1.5">
+          {/* Row 2: Amount and Type */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+            {/* Amount Filter - Increased Width */}
+            <div className="space-y-1.5 md:col-span-5 lg:col-span-4">
               <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Valor (Min - Max)</label>
               <div className="flex space-x-2">
                 <input
-                  type="number"
+                  type="text"
                   placeholder="Min"
                   className="w-full rounded-xl border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all p-2.5 outline-none"
-                  value={filters.minAmount || ''}
-                  onChange={(e) => onFilterChange({ ...filters, minAmount: e.target.value ? Number(e.target.value) : null })}
+                  value={formatNumber(filters.minAmount)}
+                  onChange={(e) => handleAmountChange('minAmount', e.target.value)}
                 />
                 <input
-                  type="number"
+                  type="text"
                   placeholder="Max"
                   className="w-full rounded-xl border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all p-2.5 outline-none"
-                  value={filters.maxAmount || ''}
-                  onChange={(e) => onFilterChange({ ...filters, maxAmount: e.target.value ? Number(e.target.value) : null })}
+                  value={formatNumber(filters.maxAmount)}
+                  onChange={(e) => handleAmountChange('maxAmount', e.target.value)}
                 />
               </div>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 md:col-span-3 lg:col-span-2">
               <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tipo</label>
               <select
-                className="w-full rounded-xl border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all p-2.5 outline-none"
+                className="w-full rounded-xl border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all p-2.5 outline-none cursor-pointer"
                 value={filters.type || ''}
                 onChange={(e) => onFilterChange({ ...filters, type: e.target.value ? e.target.value as 'income' | 'expense' : null })}
               >
-                <option value="">Todos</option>
-                <option value="income">Receita</option>
-                <option value="expense">Despesa</option>
+                <option value="" className="bg-white dark:bg-gray-800">Todos</option>
+                <option value="income" className="bg-white dark:bg-gray-800">Receita</option>
+                <option value="expense" className="bg-white dark:bg-gray-800">Despesa</option>
               </select>
             </div>
           </div>
 
           {hasActiveFilters && (
-            <div className="mt-6 flex justify-end">
+            <div className="flex justify-end pt-2">
               <button
                 onClick={clearFilters}
                 className="flex items-center px-4 py-2 text-sm text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/30 dark:text-red-400 rounded-lg transition-colors duration-200"

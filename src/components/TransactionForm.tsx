@@ -163,8 +163,8 @@ export const TransactionForm: React.FC<Props> = ({ onAdd, onClose, editingTransa
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value as 'income' | 'expense' })}
               >
-                <option value="expense">Despesa</option>
-                <option value="income">Receita</option>
+                <option value="income" className="bg-white dark:bg-gray-800">Receita</option>
+                <option value="expense" className="bg-white dark:bg-gray-800">Despesa</option>
               </select>
             </div>
 

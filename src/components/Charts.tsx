@@ -133,37 +133,63 @@ export const Charts: React.FC<Props> = ({ transactions }) => {
           </h3>
           <ResponsiveContainer width="100%" height={350}>
             {pieData.length > 0 ? (
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={80}
-                  outerRadius={110}
-                  paddingAngle={2}
-                  dataKey="value"
-                >
+              <div className="flex flex-col md:flex-row items-center justify-center gap-8 h-full">
+                <div className="w-full md:w-1/2 h-[300px] relative">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={pieData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                        cornerRadius={5}
+                        stroke="none"
+                      >
+                        {pieData.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={entry.color}
+                            className="transition-all duration-300 hover:opacity-80 cursor-pointer"
+                            style={{ filter: `drop-shadow(0px 0px 4px ${entry.color}40)` }}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<CustomTooltip />} />
+                    </PieChart>
+                  </ResponsiveContainer>
+
+                </div>
+
+                <div className="w-full md:w-1/2 space-y-3 pr-4">
                   {pieData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={entry.color}
-                      strokeWidth={0}
-                    />
+                    <div key={index} className="flex items-center justify-between group cursor-pointer p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <div
+                          className="w-3 h-3 rounded-full ring-2 ring-offset-2 ring-transparent group-hover:ring-current transition-all"
+                          style={{ backgroundColor: entry.color, color: entry.color }}
+                        />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {entry.name}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-4">
+                        <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 min-w-[3rem] text-center">
+                          {entry.percentage}
+                        </span>
+                      </div>
+                    </div>
                   ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend
-                  verticalAlign="bottom"
-                  height={36}
-                  iconType="circle"
-                  formatter={(value) => (
-                    <span className="text-gray-600 dark:text-gray-300 ml-1">{value}</span>
-                  )}
-                />
-              </PieChart>
+                </div>
+              </div>
             ) : (
-              <div className="flex h-full items-center justify-center text-gray-500 dark:text-gray-400">
-                Nehuma despesa registrada
+              <div className="flex h-full items-center justify-center flex-col text-gray-400 dark:text-gray-500">
+                <div className="w-16 h-16 rounded-full border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center mb-2">
+                  <span className="text-2xl">?</span>
+                </div>
+                <p>Nenhuma despesa registrada</p>
               </div>
             )}
           </ResponsiveContainer>
