@@ -15,7 +15,7 @@ export const TransactionForm: React.FC<Props> = ({ onAdd, onClose, editingTransa
     amount: editingTransaction?.amount ? editingTransaction.amount.toString() : '',
     date: editingTransaction?.date || new Date().toISOString().split('T')[0],
     description: editingTransaction?.description || '',
-    type: editingTransaction?.type || 'expense' as 'income' | 'expense',
+    type: editingTransaction?.type || 'income' as 'income' | 'expense',
     repeatMonths: '0',
   });
 

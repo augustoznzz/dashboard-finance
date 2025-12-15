@@ -2,7 +2,7 @@ import React from 'react';
 import {
   PieChart, Pie, Cell,
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-  BarChart, Bar, Legend,
+  BarChart, Bar,
   ResponsiveContainer
 } from 'recharts';
 import { Transaction } from '../types';
@@ -161,8 +161,8 @@ export const Charts: React.FC<Props> = ({ transactions }) => {
                         data={pieData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={60}
-                        outerRadius={80}
+                        innerRadius={90}
+                        outerRadius={120}
                         paddingAngle={5}
                         dataKey="value"
                         cornerRadius={5}
@@ -185,8 +185,8 @@ export const Charts: React.FC<Props> = ({ transactions }) => {
 
                 <div className="w-full md:w-1/2 space-y-3 pr-4">
                   {pieData.map((entry, index) => (
-                    <div key={index} className="flex items-center justify-between group cursor-pointer p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
-                      <div className="flex items-center space-x-3">
+                    <div key={index} className="flex items-center gap-4 group cursor-pointer p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors max-w-fit">
+                      <div className="flex items-center space-x-3 min-w-[80px]">
                         <div
                           className="w-3 h-3 rounded-full ring-2 ring-offset-2 ring-transparent group-hover:ring-current transition-all"
                           style={{ backgroundColor: entry.color, color: entry.color }}
@@ -216,10 +216,22 @@ export const Charts: React.FC<Props> = ({ transactions }) => {
         </div>
 
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-white/20 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
-          <h3 className="text-lg font-bold mb-6 dark:text-white flex items-center">
-            <span className="w-1.5 h-6 bg-emerald-500 rounded-full mr-3"></span>
-            Receitas vs Despesas
-          </h3>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 sm:gap-0">
+            <h3 className="text-lg font-bold dark:text-white flex items-center">
+              <span className="w-1.5 h-6 bg-emerald-500 rounded-full mr-3"></span>
+              Receitas vs Despesas
+            </h3>
+            <div className="flex items-center gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-[#10B981]"></div>
+                <span className="text-gray-600 dark:text-gray-300">Receitas</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-[#EF4444]"></div>
+                <span className="text-gray-600 dark:text-gray-300">Despesas</span>
+              </div>
+            </div>
+          </div>
           <ResponsiveContainer width="100%" height={350}>
             <BarChart data={Object.values(barData)} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" className="dark:opacity-10" />
@@ -237,7 +249,7 @@ export const Charts: React.FC<Props> = ({ transactions }) => {
                 tickFormatter={(value) => `R$ ${value / 1000}k`}
               />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(229, 231, 235, 0.2)' }} />
-              <Legend verticalAlign="top" align="right" iconType="circle" />
+
               <Bar dataKey="income" fill="#10B981" name="Receitas" radius={[4, 4, 0, 0]} maxBarSize={50} />
               <Bar dataKey="expense" fill="#EF4444" name="Despesas" radius={[4, 4, 0, 0]} maxBarSize={50} />
             </BarChart>
@@ -246,10 +258,26 @@ export const Charts: React.FC<Props> = ({ transactions }) => {
       </div>
 
       <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-white/20 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
-        <h3 className="text-lg font-bold mb-6 dark:text-white flex items-center">
-          <span className="w-1.5 h-6 bg-indigo-500 rounded-full mr-3"></span>
-          Evolução Financeira
-        </h3>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 sm:gap-0">
+          <h3 className="text-lg font-bold dark:text-white flex items-center">
+            <span className="w-1.5 h-6 bg-indigo-500 rounded-full mr-3"></span>
+            Evolução Financeira
+          </h3>
+          <div className="flex items-center gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-[#4F46E5]"></div>
+              <span className="text-gray-600 dark:text-gray-300">Saldo</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-[#10B981]"></div>
+              <span className="text-gray-600 dark:text-gray-300">Receitas</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-[#EF4444]"></div>
+              <span className="text-gray-600 dark:text-gray-300">Despesas</span>
+            </div>
+          </div>
+        </div>
         <ResponsiveContainer width="100%" height={400}>
           <AreaChart data={lineData} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
             <defs>
@@ -282,7 +310,7 @@ export const Charts: React.FC<Props> = ({ transactions }) => {
               tickFormatter={(value) => `R$ ${value / 1000}k`}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Legend verticalAlign="top" align="right" iconType="circle" />
+
             <Area
               type="monotone"
               dataKey="balance"
