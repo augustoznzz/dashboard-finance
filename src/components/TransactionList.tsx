@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Transaction, SortConfig } from '../types';
 import { format, parseISO } from 'date-fns';
 import { Trash2, Edit, ArrowUpDown } from 'lucide-react';
@@ -46,90 +45,88 @@ export const TransactionList: React.FC<Props> = ({ transactions, onDelete, onEdi
     return (
       <ArrowUpDown
         size={14}
-        className={`transform transition-transform ${
-          sortConfig.field === field
-            ? sortConfig.direction === 'asc'
-              ? 'rotate-180'
-              : ''
-            : 'opacity-50'
-        }`}
+        className={`transform transition-transform ${sortConfig.field === field
+          ? sortConfig.direction === 'asc'
+            ? 'rotate-180 text-blue-600 dark:text-blue-400'
+            : 'text-blue-600 dark:text-blue-400'
+          : 'opacity-30 group-hover:opacity-100'
+          }`}
       />
     );
   };
 
   return (
-    <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-50 dark:bg-gray-700">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                <button
-                  onClick={() => handleSort('date')}
-                  className="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-gray-200"
-                >
-                  <span>Data</span>
-                  {getSortIcon('date')}
-                </button>
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nome</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Categoria</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                <button
-                  onClick={() => handleSort('amount')}
-                  className="flex items-center space-x-1 hover:text-gray-700 dark:hover:text-gray-200"
-                >
-                  <span>Valor</span>
-                  {getSortIcon('amount')}
-                </button>
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Tipo</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ações</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-            {sortedTransactions.map((transaction) => (
-              <tr key={transaction.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                  {format(parseISO(transaction.date), 'dd/MM/yyyy')}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                  {transaction.name}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead className="bg-gray-50/50 dark:bg-gray-800/50">
+          <tr>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider group cursor-pointer" onClick={() => handleSort('date')}>
+              <div className="flex items-center space-x-2">
+                <span>Data</span>
+                {getSortIcon('date')}
+              </div>
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nome</th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Categoria</th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider group cursor-pointer" onClick={() => handleSort('amount')}>
+              <div className="flex items-center space-x-2">
+                <span>Valor</span>
+                {getSortIcon('amount')}
+              </div>
+            </th>
+            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tipo</th>
+            <th className="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Ações</th>
+          </tr>
+        </thead>
+        <tbody className="bg-white/50 dark:bg-gray-800/50 divide-y divide-gray-200 dark:divide-gray-700 backdrop-blur-xl">
+          {sortedTransactions.map((transaction) => (
+            <tr key={transaction.id} className="hover:bg-gray-50/80 dark:hover:bg-gray-700/50 transition-colors duration-150 group">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                {format(parseISO(transaction.date), 'dd/MM/yyyy')}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                {transaction.name}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
                   {transaction.category}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                </span>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold">
+                <span className={transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
                   {formatCurrency(transaction.amount)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    transaction.type === 'income'
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                      : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                </span>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${transaction.type === 'income'
+                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800'
+                  : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800'
                   }`}>
-                    {transaction.type === 'income' ? 'Receita' : 'Despesa'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  {transaction.type === 'income' ? 'Receita' : 'Despesa'}
+                </span>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div className="flex justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => onEdit(transaction)}
-                    className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4"
+                    className="p-1 rounded-lg text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/30 transition-colors"
+                    title="Editar"
                   >
                     <Edit size={18} />
                   </button>
                   <button
                     onClick={() => onDelete(transaction.id)}
-                    className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                    className="p-1 rounded-lg text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/30 transition-colors"
+                    title="Deletar"
                   >
                     <Trash2 size={18} />
                   </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

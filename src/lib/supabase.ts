@@ -2,6 +2,9 @@ import { Transaction } from '../types';
 
 const STORAGE_KEY = 'financial_transactions';
 
+// We'll keep the same function signatures to avoid breaking the rest of the app,
+// but implement them using localStorage.
+
 const generateId = (): string => {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 };
@@ -25,11 +28,14 @@ const saveTransactionsToStorage = (transactions: Transaction[]): void => {
 };
 
 export const fetchTransactions = async (): Promise<Transaction[]> => {
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 300));
   const transactions = getTransactionsFromStorage();
   return transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 };
 
 export const saveTransaction = async (transaction: Omit<Transaction, 'id'>): Promise<Transaction | null> => {
+  await new Promise(resolve => setTimeout(resolve, 300));
   try {
     const transactions = getTransactionsFromStorage();
     const newTransaction: Transaction = {
@@ -46,6 +52,7 @@ export const saveTransaction = async (transaction: Omit<Transaction, 'id'>): Pro
 };
 
 export const updateTransaction = async (transaction: Transaction): Promise<Transaction | null> => {
+  await new Promise(resolve => setTimeout(resolve, 300));
   try {
     const transactions = getTransactionsFromStorage();
     const index = transactions.findIndex(t => t.id === transaction.id);
@@ -65,6 +72,7 @@ export const updateTransaction = async (transaction: Transaction): Promise<Trans
 };
 
 export const deleteTransaction = async (id: string): Promise<boolean> => {
+  await new Promise(resolve => setTimeout(resolve, 300));
   try {
     const transactions = getTransactionsFromStorage();
     const filtered = transactions.filter(t => t.id !== id);

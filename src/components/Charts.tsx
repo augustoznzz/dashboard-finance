@@ -1,44 +1,54 @@
 import React from 'react';
 import {
   PieChart, Pie, Cell,
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   BarChart, Bar, Legend,
   ResponsiveContainer
 } from 'recharts';
 import { Transaction } from '../types';
 import { format, parseISO, parse } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { formatCurrency, formatNumber } from '../utils/format';
+import { formatCurrency } from '../utils/format';
 
-// Create a color map to ensure consistent colors per category
-const categoryColors = new Map<string, string>();
+// Modern, vibrant color palette
 const COLORS = {
   primary: [
-    '#FF6B6B',   // Coral Red
-    '#4ECDC4',   // Turquoise
-    '#45B7D1',   // Sky Blue
-    '#96CEB4',   // Sage Green
-    '#9B5DE5',   // Purple
-    '#F15BB5',   // Pink
-    '#00BBF9',   // Bright Blue
-    '#00F5D4',   // Mint
-    '#FEE440',   // Yellow
-    '#F29E4C',   // Orange
-    '#E76F51',   // Burnt Orange
-    '#845EC2',   // Deep Purple
-    '#D65DB1',   // Magenta
-    '#FF9671',   // Peach
-    '#FFC75F',   // Golden Yellow
-    '#2C73D2',   // Royal Blue
-    '#008F7A',   // Deep Teal
-    '#C34A36',   // Rusty Red
-    '#FF8066',   // Salmon
-    '#4B4453'    // Dark Gray
+    '#4F46E5', // Indigo
+    '#10B981', // Emerald
+    '#F59E0B', // Amber
+    '#EC4899', // Pink
+    '#8B5CF6', // Violet
+    '#06B6D4', // Cyan
+    '#F97316', // Orange
+    '#14B8A6', // Teal
+    '#6366F1', // Indigo Light
+    '#84CC16', // Lime
   ]
 };
 
 const calculatePercentage = (value: number, total: number): string => {
   return `${((value / total) * 100).toFixed(1)}%`;
+};
+
+// Custom Tooltip Component
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm p-4 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700">
+        <p className="font-semibold text-gray-900 dark:text-white mb-2">{label}</p>
+        {payload.map((entry: any, index: number) => (
+          <div key={index} className="flex items-center space-x-2 text-sm">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
+            <span className="text-gray-600 dark:text-gray-300 capitalize">{entry.name}:</span>
+            <span className="font-bold text-gray-900 dark:text-white">
+              {typeof entry.value === 'number' ? formatCurrency(entry.value) : entry.value}
+            </span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return null;
 };
 
 type Props = {
@@ -61,10 +71,10 @@ export const Charts: React.FC<Props> = ({ transactions }) => {
       return acc;
     }, {}));
 
-  const sortedExpenses = Object.entries(expensesByCategory)
+  const sortedExpenses = expensesByCategory
     .sort((a, b) => b[1].total - a[1].total);
 
-  const totalExpenses = sortedExpenses.reduce((sum, [_, data]) => sum + data.total, 0);
+  const totalExpenses = sortedExpenses.reduce((sum, item) => sum + item[1].total, 0);
 
   const pieData = sortedExpenses.map(([name, data]) => ({
     name,
@@ -76,13 +86,13 @@ export const Charts: React.FC<Props> = ({ transactions }) => {
   // Prepare data for line chart
   const lineData = Object.values(transactions
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    .reduce((acc, curr, _, arr) => {
+    .reduce((acc, curr) => {
       const date = format(parseISO(curr.date), 'MM/yyyy');
       const amount = curr.type === 'income' ? curr.amount : -curr.amount;
       if (!acc[date]) {
         const lastDate = Object.keys(acc).sort().pop();
         const lastBalance = lastDate ? acc[lastDate].balance : 0;
-        acc[date] = { 
+        acc[date] = {
           date,
           balance: lastBalance,
           income: 0,
@@ -113,140 +123,141 @@ export const Charts: React.FC<Props> = ({ transactions }) => {
   }, {} as Record<string, { month: string; income: number; expense: number }>);
 
   return (
-    <div className="space-y-6 mt-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-4 dark:text-white">Despesas por Categoria</h3>
-          <ResponsiveContainer width="100%" height={400}>
-          <PieChart margin={{ top: 30, right: 30, bottom: 30, left: 30 }}>
-            <Pie
-              data={pieData}
-              cx="50%"
-              cy="50%"
-              labelLine={{ stroke: '#666666', strokeWidth: 0.5 }}
-              label={({ name, value, percentage }) => {
-                return [
-                  `${name.substring(0, 12)}${name.length > 12 ? '...' : ''}`,
-                  `${formatCurrency(value)}`,
-                  `(${percentage})`
-                ].join('\n');
-              }}
-              outerRadius={120}
-              innerRadius={80}
-              dataKey="value"
-              style={{ fontSize: '16px' }}
-            >
-              {pieData.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
-                  fill={entry.color}
-                />
-              ))}
-            </Pie>
-            <Tooltip 
-              formatter={(value: number, name: string, entry: any) => [
-                `${formatCurrency(value)} (${entry.payload.percentage})`,
-                name
-              ]}
-              contentStyle={{
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '12px',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                fontSize: '14px'
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-      
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-        <h3 className="text-lg font-semibold mb-4 dark:text-white">Receitas vs Despesas</h3>
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={Object.values(barData)} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" className="dark:opacity-10" />
-            <XAxis 
-              dataKey="month" 
-              style={{ fontSize: '12px' }}
-              className="dark:text-gray-300"
-            />
-            <YAxis 
-              style={{ fontSize: '12px' }}
-              className="dark:text-gray-300"
-            />
-            <Tooltip 
-              formatter={(value: number) => formatCurrency(value)}
-              contentStyle={{
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '12px',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                fontSize: '14px'
-              }}
-            />
-            <Legend />
-            <Bar dataKey="income" fill="#22c55e" name="Receitas" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="expense" fill="#ef4444" name="Despesas" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+    <div className="space-y-8 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-white/20 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+          <h3 className="text-lg font-bold mb-6 dark:text-white flex items-center">
+            <span className="w-1.5 h-6 bg-indigo-500 rounded-full mr-3"></span>
+            Despesas por Categoria
+          </h3>
+          <ResponsiveContainer width="100%" height={350}>
+            <PieChart>
+              <Pie
+                data={pieData}
+                cx="50%"
+                cy="50%"
+                innerRadius={80}
+                outerRadius={110}
+                paddingAngle={2}
+                dataKey="value"
+              >
+                {pieData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={entry.color}
+                    strokeWidth={0}
+                  />
+                ))}
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+              <Legend
+                verticalAlign="bottom"
+                height={36}
+                iconType="circle"
+                formatter={(value, entry: any) => (
+                  <span className="text-gray-600 dark:text-gray-300 ml-1">{value}</span>
+                )}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-white/20 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+          <h3 className="text-lg font-bold mb-6 dark:text-white flex items-center">
+            <span className="w-1.5 h-6 bg-emerald-500 rounded-full mr-3"></span>
+            Receitas vs Despesas
+          </h3>
+          <ResponsiveContainer width="100%" height={350}>
+            <BarChart data={Object.values(barData)} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" className="dark:opacity-10" />
+              <XAxis
+                dataKey="month"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: '#6B7280', fontSize: 12 }}
+                dy={10}
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: '#6B7280', fontSize: 12 }}
+                tickFormatter={(value) => `R$ ${value / 1000}k`}
+              />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(229, 231, 235, 0.2)' }} />
+              <Legend verticalAlign="top" align="right" iconType="circle" />
+              <Bar dataKey="income" fill="#10B981" name="Receitas" radius={[4, 4, 0, 0]} maxBarSize={50} />
+              <Bar dataKey="expense" fill="#EF4444" name="Despesas" radius={[4, 4, 0, 0]} maxBarSize={50} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-        <h3 className="text-lg font-semibold mb-4 dark:text-white">Evolução do Saldo</h3>
+      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-white/20 dark:border-gray-700/50 hover:shadow-xl transition-shadow">
+        <h3 className="text-lg font-bold mb-6 dark:text-white flex items-center">
+          <span className="w-1.5 h-6 bg-indigo-500 rounded-full mr-3"></span>
+          Evolução Financeira
+        </h3>
         <ResponsiveContainer width="100%" height={400}>
-          <LineChart data={lineData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" className="dark:opacity-10" />
-            <XAxis 
-              dataKey="date" 
-              tickFormatter={(value) => format(parse(value, 'MM/yyyy', new Date()), 'MMM/yyyy', { locale: ptBR })}
-              style={{ fontSize: '12px' }}
-              className="dark:text-gray-300"
+          <AreaChart data={lineData} margin={{ top: 20, right: 30, left: 10, bottom: 5 }}>
+            <defs>
+              <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="#4F46E5" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#10B981" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#EF4444" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="#EF4444" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" className="dark:opacity-10" />
+            <XAxis
+              dataKey="date"
+              tickFormatter={(value) => format(parse(value, 'MM/yyyy', new Date()), 'MMM', { locale: ptBR })}
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#6B7280', fontSize: 12 }}
+              dy={10}
             />
-            <YAxis 
-              style={{ fontSize: '12px' }}
-              className="dark:text-gray-300"
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#6B7280', fontSize: 12 }}
+              tickFormatter={(value) => `R$ ${value / 1000}k`}
             />
-            <Tooltip 
-              formatter={(value: number) => formatCurrency(value)}
-              contentStyle={{
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '12px',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-                fontSize: '14px'
-              }}
-            />
-            <Line 
-              type="monotone" 
-              dataKey="balance" 
-              stroke="#6366f1"
-              strokeWidth={2}
-              dot={{ fill: '#6366f1', strokeWidth: 1, r: 4 }}
-              activeDot={{ r: 8 }}
+            <Tooltip content={<CustomTooltip />} />
+            <Legend verticalAlign="top" align="right" iconType="circle" />
+            <Area
+              type="monotone"
+              dataKey="balance"
+              stroke="#4F46E5"
+              strokeWidth={3}
+              fillOpacity={1}
+              fill="url(#colorBalance)"
               name="Saldo"
             />
-            <Line 
-              type="monotone" 
-              dataKey="income" 
-              stroke="#22c55e"
+            <Area
+              type="monotone"
+              dataKey="income"
+              stroke="#10B981"
               strokeWidth={2}
-              dot={{ fill: '#22c55e', strokeWidth: 1, r: 4 }}
+              fillOpacity={1}
+              fill="url(#colorIncome)"
               name="Receitas"
             />
-            <Line 
-              type="monotone" 
-              dataKey="expense" 
-              stroke="#ef4444"
+            <Area
+              type="monotone"
+              dataKey="expense"
+              stroke="#EF4444"
               strokeWidth={2}
-              dot={{ fill: '#ef4444', strokeWidth: 1, r: 4 }}
+              fillOpacity={1}
+              fill="url(#colorExpense)"
               name="Despesas"
             />
-            <Legend />
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
       </div>
     </div>
