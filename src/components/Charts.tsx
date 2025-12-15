@@ -27,6 +27,7 @@ const COLORS = {
 };
 
 const calculatePercentage = (value: number, total: number): string => {
+  if (total === 0) return '0%';
   return `${((value / total) * 100).toFixed(1)}%`;
 };
 
@@ -131,34 +132,40 @@ export const Charts: React.FC<Props> = ({ transactions }) => {
             Despesas por Categoria
           </h3>
           <ResponsiveContainer width="100%" height={350}>
-            <PieChart>
-              <Pie
-                data={pieData}
-                cx="50%"
-                cy="50%"
-                innerRadius={80}
-                outerRadius={110}
-                paddingAngle={2}
-                dataKey="value"
-              >
-                {pieData.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={entry.color}
-                    strokeWidth={0}
-                  />
-                ))}
-              </Pie>
-              <Tooltip content={<CustomTooltip />} />
-              <Legend
-                verticalAlign="bottom"
-                height={36}
-                iconType="circle"
-                formatter={(value, entry: any) => (
-                  <span className="text-gray-600 dark:text-gray-300 ml-1">{value}</span>
-                )}
-              />
-            </PieChart>
+            {pieData.length > 0 ? (
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={80}
+                  outerRadius={110}
+                  paddingAngle={2}
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={entry.color}
+                      strokeWidth={0}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+                <Legend
+                  verticalAlign="bottom"
+                  height={36}
+                  iconType="circle"
+                  formatter={(value) => (
+                    <span className="text-gray-600 dark:text-gray-300 ml-1">{value}</span>
+                  )}
+                />
+              </PieChart>
+            ) : (
+              <div className="flex h-full items-center justify-center text-gray-500 dark:text-gray-400">
+                Nehuma despesa registrada
+              </div>
+            )}
           </ResponsiveContainer>
         </div>
 
