@@ -139,7 +139,13 @@ export const ExportPdfForm: React.FC<Props> = ({ onClose, transactions, chartsRe
         pdf.text('Análise Gráfica', 20, yPos);
         yPos += 5;
 
-        const canvas = await html2canvas(chartsRef.current, { scale: 2 });
+        const canvas = await html2canvas(chartsRef.current, {
+          scale: 2,
+          backgroundColor: '#ffffff',
+          onclone: (clonedDoc) => {
+            clonedDoc.documentElement.classList.remove('dark');
+          }
+        });
         const imgData = canvas.toDataURL('image/png');
         const imgWidth = pageWidth - 40;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
