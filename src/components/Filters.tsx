@@ -5,9 +5,10 @@ import { FilterOptions } from '../types';
 type Props = {
   filters: FilterOptions;
   onFilterChange: (filters: FilterOptions) => void;
+  availableCategories: string[];
 };
 
-export const Filters: React.FC<Props> = ({ filters, onFilterChange }) => {
+export const Filters: React.FC<Props> = ({ filters, onFilterChange, availableCategories }) => {
   const [isOpen, setIsOpen] = useState(true);
 
   const clearFilters = () => {
@@ -100,13 +101,16 @@ export const Filters: React.FC<Props> = ({ filters, onFilterChange }) => {
 
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Categoria</label>
-              <input
-                type="text"
-                placeholder="Ex: Alimentação"
-                className="w-full rounded-xl border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all p-2.5 outline-none"
+              <select
+                className="w-full rounded-xl border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 text-gray-900 dark:text-white shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all p-2.5 outline-none cursor-pointer"
                 value={filters.category || ''}
                 onChange={(e) => onFilterChange({ ...filters, category: e.target.value || null })}
-              />
+              >
+                <option value="" className="bg-white dark:bg-gray-800">Todas</option>
+                {availableCategories.map((category) => (
+                  <option key={category} value={category} className="bg-white dark:bg-gray-800">{category}</option>
+                ))}
+              </select>
             </div>
           </div>
 

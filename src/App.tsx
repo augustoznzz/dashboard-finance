@@ -183,7 +183,7 @@ function App() {
           </div>
         </div>
 
-        <Filters filters={filters} onFilterChange={setFilters} />
+        <Filters filters={filters} onFilterChange={setFilters} availableCategories={Array.from(new Set(transactions.map(t => t.category)))} />
 
         <div ref={chartsRef} className="mb-10">
           <Charts transactions={filteredTransactions} />
